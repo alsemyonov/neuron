@@ -23,7 +23,8 @@ module Neuron
       end
 
       def page_title(title = nil, options = {})
-        options = {default: navigation_title}.merge(default_options).merge(options)
+        options = default_options.merge(options)
+        options = options.merge(default: navigation_title(title, options))
         @page_title ||= title || view.t('.title', options)
       end
 
@@ -49,7 +50,7 @@ module Neuron
       # @param [String, nil] title title to set
       # @param [Hash] options options to {I18n#translate} if building default title
       def page_title(title = nil, options = {})
-        neuron_title.page_title(title, options)
+        neuron_title.page_title(title, options).html_safe
       end
 
       def navigation_title(title = nil, options = {})

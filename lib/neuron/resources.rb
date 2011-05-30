@@ -112,7 +112,9 @@ module Neuron
               result << if collection.any?
                           collection_list(collection)
                         else
-                          content_tag(:p, t(:no_entries, :scope => [:resources, :collection, :no_entries], :default => [controller_i18n_scope.to_sym, :all]))
+                          content_tag(:p, t(:no_entries,
+                                            scope: [:resources, :collection, :no_entries],
+                                            default: [controller_i18n_scope.to_sym, :all]))
                         end
             end
           end
@@ -123,9 +125,9 @@ module Neuron
         resource ||= self.resource
         action = action_name.to_sym
         ''.html_safe.tap do |result|
-          result << title(t("navigation.#{controller_i18n_scope}.#{action}",
-                            resource: link_to(resource, canonical_path(resource)),
-                            default: resource.to_s).html_safe)
+          result << title(nil,
+                          resource: link_to(resource, canonical_path(resource)),
+                          default:  resource.to_s)
           if (action == :show) && can?(:update, resource)
             result << content_tag(:sup,
               link_to(t(:edit,
