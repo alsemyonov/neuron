@@ -43,34 +43,33 @@ module Neuron
       # @param [Hash] html_options html options hash
       # @option options [Symbol, String] :by the name of the columnt to sort by
       # @option options [String] :as the text used in link, defaults to human_method_name of :by
-      # @option options [String] :params hash with additional params which will be added to generated url
+      # @option options [String] :url url options when order link does not correspond to current collection_path
       def order(options = {}, html_options = {})
+        options[:class] ||= resource_class
         options[:by] = options[:by].to_sym
-        options[:as] ||= human(resource_class, options[:by])
+        options[:as] ||= human(options[:class], options[:by])
         asc_orders  = Array(params[:ascending]).map(&:to_sym)
         desc_orders = Array(params[:descending]).map(&:to_sym)
         ascending = asc_orders.include?(options[:by])
         selected  = ascending || desc_orders.include?(options[:by])
         new_scope = ascending ? :descending : :ascending
-        url_options = params.dup.merge(ascending: asc_orders, descending: desc_orders)
+        url_options = {page: params[:page]}
+        url_options[new_scope] = [options[:by]]
 
         if selected
           css_classes = html_options[:class] ? html_options[:class].split(/\s+/) : []
           if ascending # selected
             options[:as] = "&#9650;&nbsp;#{options[:as]}"
             css_classes << 'ascending'
-            url_options[:ascending] = url_options[:ascending] - [options[:by]]
           else # descending selected
             options[:as] = "&#9660;&nbsp;#{options[:as]}"
             css_classes << 'descending'
-            url_options[:descending] = url_options[:descending] - [options[:by]]
           end
           html_options[:class] = css_classes.join(' ')
         end
-        url_options[new_scope] += [options[:by]]
-        url_options[:ascending] = url_options[:ascending].uniq
-        url_options[:descending] = url_options[:descending].uniq
-        link_to(options[:as].html_safe, collection_path(url_options.deep_merge(options[:params] || {})), html_options)
+        url = options[:url] ? url_for(options[:url].merge(url_options)) : collection_path(url_options)
+
+        link_to(options[:as].html_safe, url, html_options)
       end
 
       def collection_title(collection = nil, tag = :h1)
