@@ -1,0 +1,6 @@
+%ul.b-flashes
+  - flash.each do |kind, message|
+    %li{:class => "b-flashes__flash b-flashes__#{kind}"}
+      %p
+        %span.ui-icon{:class => "ui-icon-#{kind == :alert ? 'alert' : 'info'}"}
+        = message

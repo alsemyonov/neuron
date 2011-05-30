@@ -4,7 +4,7 @@ require 'action_view/template/resolver'
 module Neuron
   class Resolver < ::ActionView::FileSystemResolver
     def initialize
-      super('app/views/neuron')
+      super(File.join(Neuron.path, 'app', 'views'))
     end
 
     def find_templates(name, prefix, partial, details)

@@ -1,0 +1,4 @@
+= collection_block
+
+= content_for :head do
+  = auto_discovery_link_tag(:atom, {auth_token: current_user.try(:authentication_token)}, title: strip_tags(head_title))

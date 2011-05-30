@@ -1,0 +1,4 @@
+ru:
+  application:
+    meta:
+      title: Define me in config/locales/en.yml with key en.application.meta.title

@@ -1,0 +1,4 @@
+ru:
+  application:
+    meta:
+      title: Определите заголовок приложения в файле config/locales/ru.yml с ключом ru.application.meta.title
