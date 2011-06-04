@@ -72,15 +72,17 @@ module Neuron
         link_to(options[:as].html_safe, url, html_options)
       end
 
-      def collection_title(collection = nil, tag = :h1)
+      def collection_title(collection = nil, options = {})
         collection ||= self.collection
-        options = {count: collection.count}
+        tag           = options.delete(:tag)      { :h1 }
+        new_link      = options.delete(:new_link) { link_to(t("#{controller_i18n_scope}.new", scope: :actions, default: [:new, 'New']), new_resource_path) }
+        i18n_options  = options.delete(:i18n)     { {count: collection.count} }
         ''.html_safe.tap do |result|
           result << title(t("#{controller_i18n_scope}.#{view_name}.title",
-                            options.merge(default: t("navigation.#{controller_i18n_scope}.#{action_name}", options))),
+                            options.merge(default: t("navigation.#{controller_i18n_scope}.#{action_name}", i18n_options))),
                           tag: tag)
-          if can?(:create, resource_class) && controller.respond_to?(:create)
-            result << link_to(t("#{controller_i18n_scope}.new", scope: :actions, default: [:new, 'New']), new_resource_path)
+          if new_link && can?(:create, resource_class) && controller.respond_to?(:create)
+            result << new_link
           end
         end
       end
