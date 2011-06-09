@@ -107,7 +107,7 @@ module Neuron
         collection ||= self.collection
         content_tag(:article, class: 'b-collection') do
           ''.html_safe.tap do |result|
-            result << content_tag(:header, collection_title(collection, tag), class: 'b-collection__header')
+            result << content_tag(:header, collection_title(collection, tag: tag), class: 'b-collection__header')
             if block_given?
               result << capture(&block)
             else
