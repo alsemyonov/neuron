@@ -48,6 +48,7 @@ module Neuron
         options[:class] ||= resource_class
         options[:by] = options[:by].to_sym
         options[:as] ||= human(options[:class], options[:by])
+        html_options[:title] ||= human(options[:class], options[:by])
         asc_orders  = Array(params[:ascending]).map(&:to_sym)
         desc_orders = Array(params[:descending]).map(&:to_sym)
         ascending = asc_orders.include?(options[:by])
@@ -130,7 +131,7 @@ module Neuron
           result << title(nil,
                           resource: link_to(resource, canonical_path(resource)),
                           default:  resource.to_s)
-          if (action == :show) && can?(:update, resource)
+          if (action == :show) && can?(:update, resource) && controller.respond_to?(:edit)
             result << content_tag(:sup,
               link_to(t(:edit,
                         object: resource,

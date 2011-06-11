@@ -5,35 +5,22 @@ module Neuron
   autoload :Authorization,  'neuron/authorization'
   autoload :Controller,     'neuron/controller'
   autoload :Navigation,     'neuron/navigation'
+  autoload :Railtie,        'neuron/railtie'
   autoload :Resolver,       'neuron/resolver'
   autoload :Resources,      'neuron/resources'
-  autoload :Railtie,        'neuron/rails'
+  autoload :ShowFor,        'neuron/show_for'
   autoload :View,           'neuron/view'
 
-  def self.setup!
-    if defined?(ActionView)
-      ActionView::Base.send :include, Neuron::View
-      ActionView::Base.send :include, Neuron::Navigation::View
+  class << self
+    def setup!
+      Neuron::Controller.setup!
+      Neuron::View.setup!
     end
-    if defined?(ActionController)
-      ActionController::Base.send :include, Neuron::Controller
-    end
-    if defined?(InheritedResources)
-      ActionController::Base.send :include, Neuron::Resources::Controller
-      ActionView::Base.send :include, Neuron::Resources::View
-      if defined?(CanCan)
-        require 'neuron/integrations/cancan_inherited_resources'
-      end
-    end
-    if defined?(CanCan)
-      ActionController::Base.send :include, Neuron::Authorization::Controller
-      ActionView::Base.send :include, Neuron::Authorization::View
-    end
-  end
 
-  def self.path
-    File.expand_path('../..', __FILE__)
+    def path
+      File.expand_path('../..', __FILE__)
+    end
   end
 end
 
-require 'neuron/rails' if defined?(Rails)
+require 'neuron/railtie' if defined?(Rails)

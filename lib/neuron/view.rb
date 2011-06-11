@@ -2,6 +2,18 @@ require 'neuron'
 
 module Neuron
   module View
+    extend ActiveSupport::Memoizable
+
+    def self.setup!
+      if defined?(::ActionView)
+        ActionView::Base.send(:include, Neuron::View)
+        ActionView::Base.send(:include, Neuron::Navigation::View)
+        ActionView::Base.send(:include, Neuron::Resources::View)      if defined?(::InheritedResources)
+        ActionView::Base.send(:include, Neuron::Authorization::View)  if defined?(::CanCan)
+        ActionView::Base.send(:include, Neuron::ShowFor::Helper)      if defined?(::ShowFor)
+      end
+    end
+
     def block_modifiers(block, *modifiers)
       klasses = [block]
       if (options = modifiers.extract_options!).any?
@@ -28,15 +40,16 @@ module Neuron
     def human(klass, attribute = nil)
       attribute ? klass.human_attribute_name(attribute) : klass.name.human
     end
-
-    # Build canonical path for given resource
-    def canonical_path(resource, options = {})
-      canonical_url(resource, options.merge(routing_type: :path))
-    end
+    memoize :human
 
     # Build canonical url for given resource
     def canonical_url(resource, options = {})
       polymorphic_url(resource, options)
+    end
+
+    # Build canonical path for given resource
+    def canonical_path(resource, options = {})
+      canonical_url(resource, options.merge(routing_type: :path))
     end
 
     def view_name
@@ -44,8 +57,9 @@ module Neuron
     end
 
     def controller_i18n_scope
-      @controller_i18n_scope ||= controller.controller_path.gsub(%r{/}, '.')
+      controller.controller_path.gsub(%r{/}, '.')
     end
+    memoize :controller_i18n_scope
 
     def time(time, options = {})
       format        = options.delete(:format) { :short }
