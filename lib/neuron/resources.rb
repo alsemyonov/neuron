@@ -1,38 +1,96 @@
 require 'neuron'
+require 'inherited_resources'
+require 'has_scope'
 
 module Neuron
   module Resources
+    class << self
+      attr_accessor :default_options
+    end
+
+    self.default_options = {
+      order: true,
+      paginate: defined?(::WillPaginate),
+      authorize: defined?(::CanCan)
+    }
+
     module Controller
       extend ActiveSupport::Concern
 
       module ClassMethods
         def resources(options = {})
+          options = options.reverse_merge(options)
+
+          unless respond_to?(:resource_options)
+            class_attribute :resource_options
+          end
+          self.resource_options = options
+          prepend_before_filter :set_default_collection_scopes
+
           inherit_resources
           append_neuron_view_path_resolver
-          if options[:orders] == true
+
+          if options[:order] == true
             order_scopes
-          elsif options[:orders]
-            order_scopes(options[:orders])
+          elsif options[:order]
+            order_scopes(options[:order])
+          end
+
+          if options[:paginate] == true
+            paginate_scope
+          elsif options[:paginate]
+            paginate_scope(options[:paginate])
+          end
+
+          if options[:authorize]
+            # TODO remove already included modules when Ruby won’t make me crazy
+            extend Neuron::Authorization::Controller::ClassMethods
+            authorize_resources(options[:authorize])
           end
         end
+
         # Adds default ordering scopes for #index action
         # @param [Hash] options options hash
         # @option options [Array, Symbol, String] :ascending default ascending scopes
         # @option options [Array, Symbol, String] :descending default descending scopes
         def order_scopes(options = {})
           with_options only: :index, type: :array do |index|
-            index.has_scope(:ascending) { |controller, scope, values| values.any? ?  scope.asc(*values) : scope }
-            index.has_scope(:descending) { |controller, scope, values| values.any? ?  scope.desc(*values) : scope }
+            index.has_scope(:ascending)   { |controller, scope, values| values.any? ?  scope.asc(*values)  : scope }
+            index.has_scope(:descending)  { |controller, scope, values| values.any? ?  scope.desc(*values) : scope }
           end
-          prepend_before_filter :set_default_order
-          define_method(:set_default_order) do
-            unless params[:ascending] || params[:descending]
-              params[:ascending] = options[:ascending]    if options[:ascending]
-              params[:descending] = options[:descending]  if options[:descending]
+        end
+
+        def paginate_scope(options = {})
+          define_method(:collection_with_pagination) do
+            get_collection_ivar || begin
+              results = end_of_association_chain
+              if (params[:paginate] != "false") && applicable?(options[:if], true) && applicable?(options[:unless], false)
+                results = results.paginate(page: params[:page], per_page: params[:per_page])
+                headers['X-Pagination-TotalEntries']  = results.total_entries.to_s
+                headers['X-Pagination-TotalPages']    = results.total_pages.to_s
+                headers['X-Pagination-CurrentPage']   = results.current_page.to_s
+                headers['X-Pagination-PerPage']       = results.per_page.to_s
+              end
+              set_collection_ivar(results)
             end
-            params[:ascending] = Array(params[:ascending])
-            params[:descending] = Array(params[:descending])
           end
+          alias_method_chain :collection, :pagination
+        end
+      end
+
+      protected
+
+      def set_default_collection_scopes
+        if resource_options[:order]
+          unless params[:ascending] || params[:descending]
+            params[:ascending]  = resource_options[:order][:ascending]   if resource_options[:order][:ascending]
+            params[:descending] = resource_options[:order][:descending]  if resource_options[:order][:descending]
+          end
+          params[:ascending] = Array(params[:ascending])
+          params[:descending] = Array(params[:descending])
+        end
+        if resource_options[:paginate]
+          params[:page] ||= 1
         end
       end
     end

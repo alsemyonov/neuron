@@ -8,11 +8,8 @@ module Neuron
     def self.setup!
       if defined?(::ActionController)
         ActionController::Base.send(:include, Neuron::Controller)
-        if defined?(::InheritedResources)
-          ActionController::Base.send(:include, Neuron::Resources::Controller)
-          require 'neuron/integrations/cancan_inherited_resources' if defined?(::CanCan)
-        end
-        ActionController::Base.send(:include, Neuron::Authorization::Controller) if defined?(::CanCan)
+        ActionController::Base.send(:include, Neuron::Resources::Controller)      if defined?(::InheritedResources)
+        ActionController::Base.send(:include, Neuron::Authorization::Controller)  if defined?(::CanCan)
       end
     end
 
