@@ -43,8 +43,6 @@ module Neuron
           end
 
           if options[:authorize]
-            # TODO remove already included modules when Ruby won’t make me crazy
-            extend Neuron::Authorization::Controller::ClassMethods
             authorize_resources(options[:authorize])
           end
         end
