@@ -19,7 +19,7 @@ module Neuron
 
       module ClassMethods
         def resources(options = {})
-          options = options.reverse_merge(options)
+          options = Neuron::Resources.default_options.merge(options)
 
           unless respond_to?(:resource_options)
             class_attribute :resource_options
