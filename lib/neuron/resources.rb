@@ -25,7 +25,7 @@ module Neuron
             class_attribute :resource_options
           end
           self.resource_options = options
-          prepend_before_filter :set_default_collection_scopes
+          prepend_before_filter :set_default_collection_scopes, only: [:index]
 
           inherit_resources
           append_neuron_view_path_resolver
