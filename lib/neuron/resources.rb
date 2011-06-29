@@ -20,6 +20,8 @@ module Neuron
       module ClassMethods
         def resources(options = {})
           options = Neuron::Resources.default_options.merge(options)
+          options[:order] = {}    if options[:order] == true
+          options[:paginate] = {} if options[:paginate] == true
 
           unless respond_to?(:resource_options)
             class_attribute :resource_options
@@ -30,15 +32,11 @@ module Neuron
           inherit_resources
           append_neuron_view_path_resolver
 
-          if options[:order] == true
-            order_scopes
-          elsif options[:order]
+          if options[:order]
             order_scopes(options[:order])
           end
 
-          if options[:paginate] == true
-            paginate_scope
-          elsif options[:paginate]
+          if options[:paginate]
             paginate_scope(options[:paginate])
           end
 
@@ -104,12 +102,14 @@ module Neuron
         options[:class] ||= resource_class
         options[:by] = options[:by].to_sym
         options[:as] ||= human(options[:class], options[:by])
-        html_options[:title] ||= human(options[:class], options[:by])
         asc_orders  = Array(params[:ascending]).map(&:to_sym)
         desc_orders = Array(params[:descending]).map(&:to_sym)
         ascending = asc_orders.include?(options[:by])
         selected  = ascending || desc_orders.include?(options[:by])
         new_scope = ascending ? :descending : :ascending
+        html_options[:title] ||= human(options[:class], options[:by])
+        html_options['data-order-by'] = options[:by]
+        html_options['data-order-direction']    = new_scope
         url_options = {page: params[:page]}
         url_options[new_scope] = [options[:by]]
 
