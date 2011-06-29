@@ -52,6 +52,19 @@ module Neuron
       canonical_url(resource, options.merge(routing_type: :path))
     end
 
+    def canonical_link(resource = nil, options = {})
+      href = case resource
+             when Hash
+               url_for(resource)
+             when NilClass
+               request.request_uri.split('?').first
+             else
+               canonical_url(resource, options)
+             end
+      href = "#{request.protocol}#{request.host_with_port}#{href}" unless href =~ /^\w+:\/\//
+      tag(:link, rel: 'canonical', href: href)
+    end
+
     def view_name
       {create: 'new', update: 'edit'}[action_name] || action_name
     end
