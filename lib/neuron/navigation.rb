@@ -25,17 +25,17 @@ module Neuron
       def page_title(title = nil, options = {})
         options = default_options.merge(options)
         options = options.merge(default: navigation_title(title, options))
-        @page_title ||= title.to_s || view.t('.title', options)
+        @page_title ||= title.try(:to_s) || view.t('.title', options)
       end
 
       def navigation_title(title = nil, options = {})
         options = {default: @page_title || view.view_name.humanize}.merge(default_options).merge(options)
-        @navigation_title ||= title.to_s || self.class.navigation_title(view.controller_i18n_scope, view.view_name, options)
+        @navigation_title ||= title.try(:to_s) || self.class.navigation_title(view.controller_i18n_scope, view.view_name, options)
       end
 
       def head_title(title = nil, options = {})
         options = default_options.merge(options)
-        @head_title ||= title.to_s || view.strip_tags([navigation_title, application.title].compact.join(options[:title_separator]))
+        @head_title ||= title.try(:to_s) || view.strip_tags([navigation_title, application.title].compact.join(options[:title_separator]))
       end
 
       protected
