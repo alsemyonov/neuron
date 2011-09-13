@@ -59,7 +59,7 @@ module Neuron
             current_ability.attributes_for(authorization_action, resource_class).each do |attribute, value|
               resource.send("#{attribute}=", value) if attribute.is_a?(Symbol)
             end
-            resource.attributes = resource_params
+            resource.write_attributes(*resource_params)
           end
         end
 
