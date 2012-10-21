@@ -1,4 +1,6 @@
 require 'neuron'
+require 'neuron/controller'
+require 'neuron/view'
 require 'rails'
 require 'rails/engine'
 
