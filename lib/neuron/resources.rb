@@ -148,7 +148,7 @@ module Neuron
         collection_name ||= self.resource_collection_name
         if collection.respond_to?(:total_pages)
           start = 1 + (collection.current_page - 1) * collection.limit_value
-          pagination = will_paginate(collection)
+          pagination = paginate(collection)
         else
           start = 1
           pagination = ''
