@@ -64,7 +64,7 @@ module Neuron
                 headers['X-Pagination-TotalEntries']  = results.total_entries.to_s
                 headers['X-Pagination-TotalPages']    = results.total_pages.to_s
                 headers['X-Pagination-CurrentPage']   = results.current_page.to_s
-                headers['X-Pagination-PerPage']       = results.per.to_s
+                headers['X-Pagination-PerPage']       = results.limit_value.to_s
               end
               set_collection_ivar(results)
             end
@@ -147,7 +147,7 @@ module Neuron
         collection      ||= self.collection
         collection_name ||= self.resource_collection_name
         if collection.respond_to?(:total_pages)
-          start = 1 + (collection.current_page - 1) * collection.per
+          start = 1 + (collection.current_page - 1) * collection.limit_value
           pagination = will_paginate(collection)
         else
           start = 1
