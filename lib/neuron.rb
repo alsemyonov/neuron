@@ -11,15 +11,16 @@ module Neuron
   autoload :ShowFor,        'neuron/show_for'
   autoload :View,           'neuron/view'
 
-  class << self
-    def setup!
-      Neuron::Controller.setup!
-      Neuron::View.setup!
-    end
+  def self.setup!
+    require 'neuron/controller'
+    Neuron::Controller.setup!
 
-    def path
-      File.expand_path('../..', __FILE__)
-    end
+    require 'neuron/view'
+    Neuron::View.setup!
+  end
+
+  def self.path
+    File.expand_path('../..', __FILE__)
   end
 end
 
