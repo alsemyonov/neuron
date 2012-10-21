@@ -60,11 +60,11 @@ module Neuron
             get_collection_ivar || begin
               results = end_of_association_chain
               if (params[:paginate] != "false") && applicable?(options[:if], true) && applicable?(options[:unless], false)
-                results = results.paginate(page: params[:page], per_page: params[:per_page])
+                results = results.page(params[:page]).per(params[:per_page])
                 headers['X-Pagination-TotalEntries']  = results.total_entries.to_s
                 headers['X-Pagination-TotalPages']    = results.total_pages.to_s
                 headers['X-Pagination-CurrentPage']   = results.current_page.to_s
-                headers['X-Pagination-PerPage']       = results.per_page.to_s
+                headers['X-Pagination-PerPage']       = results.per.to_s
               end
               set_collection_ivar(results)
             end
@@ -147,7 +147,7 @@ module Neuron
         collection      ||= self.collection
         collection_name ||= self.resource_collection_name
         if collection.respond_to?(:total_pages)
-          start = 1 + (collection.current_page - 1) * collection.per_page
+          start = 1 + (collection.current_page - 1) * collection.per
           pagination = will_paginate(collection)
         else
           start = 1
