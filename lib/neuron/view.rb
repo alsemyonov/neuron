@@ -2,8 +2,6 @@ require 'neuron'
 
 module Neuron
   module View
-    extend ActiveSupport::Memoizable
-
     def self.setup!
       if defined?(::ActionView)
         ActionView::Base.send(:include, Neuron::View)
@@ -38,9 +36,10 @@ module Neuron
     end
 
     def human(klass, attribute = nil)
-      attribute ? klass.human_attribute_name(attribute) : klass.name.human
+      @human ||= {}
+      @human[klass] ||= {}
+      @human[klass][attribute] ||= attribute ? klass.human_attribute_name(attribute) : klass.name.human
     end
-    memoize :human
 
     # Build canonical url for given resource
     def canonical_url(resource, options = {})
@@ -70,9 +69,8 @@ module Neuron
     end
 
     def controller_i18n_scope
-      controller.controller_path.gsub(%r{/}, '.')
+      @controller_i18n_scope ||= controller.controller_path.gsub(%r{/}, '.')
     end
-    memoize :controller_i18n_scope
 
     def time(time, options = {})
       format        = options.delete(:format) { :short }
