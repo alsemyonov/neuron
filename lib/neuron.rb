@@ -5,7 +5,6 @@ module Neuron
   autoload :Authorization,  'neuron/authorization'
   autoload :Navigation,     'neuron/navigation'
   autoload :Railtie,        'neuron/railtie'
-  autoload :Resolver,       'neuron/resolver'
   autoload :Resources,      'neuron/resources'
   autoload :ShowFor,        'neuron/show_for'
 

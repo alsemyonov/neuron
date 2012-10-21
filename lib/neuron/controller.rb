@@ -12,11 +12,5 @@ module Neuron
         ActionController::Base.send(:include, Neuron::Authorization::Controller)  if defined?(::CanCan)
       end
     end
-
-    module ClassMethods
-      def append_neuron_view_path_resolver
-        append_view_path Neuron::Resolver.new
-      end
-    end
   end
 end

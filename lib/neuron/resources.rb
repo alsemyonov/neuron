@@ -30,7 +30,6 @@ module Neuron
           prepend_before_filter :set_default_collection_scopes, only: [:index]
 
           inherit_resources
-          append_neuron_view_path_resolver
 
           if options[:order]
             order_scopes(options[:order])
